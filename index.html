@@ -5,7 +5,169 @@
   <title>Gamification External Metric Upload</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    /* ... (keep all your existing CSS styles exactly as they are) ... */
+    :root{
+      --primary-color:#63AB8F; --secondary-color:#4A8C7D; --border-color:#DEE2E6;
+      --light-bg:#F8F9FA; --card-bg:#FFFFFF; --text-color:#2C3E50; --text-light:#6C757D;
+      --pill:#e9f6f0;
+    }
+    body{
+      font-family:'Aptos','Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+      margin:20px;padding:20px;max-width:1200px;background:var(--light-bg);color:var(--text-color)
+    }
+    #logo-container{text-align:center;margin-bottom:20px} #logo{width:300px}
+    h1{margin:0 0 16px}
+    .card{background:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:24px;margin-top:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+    label{display:block;font-weight:600;margin-bottom:6px}
+    input,select,button,textarea{padding:10px;border:1px solid var(--border-color);border-radius:6px;background:#fff;font-size:14px}
+    button{background:var(--primary-color);color:#fff;font-weight:600;cursor:pointer;transition:background .2s}
+    button:hover{background:var(--secondary-color)} button:disabled{background:var(--text-light);cursor:not-allowed}
+    .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:end}
+    .full-width-btn{width:100%;padding:14px 18px;font-size:16px;margin-top:12px}
+    .muted{color:var(--text-light);font-size:12px}
+    .section-title{margin:0 0 10px;color:var(--secondary-color)}
+
+    #messageContainer{display:none;margin-top:12px}
+    .error-message{color:#b4231a;background:#fee2e2;border:1px solid #fecaca;padding:10px;border-radius:6px}
+    .success-message{color:#14532d;background:#dcfce7;border:1px solid #bbf7d0;padding:10px;border-radius:6px}
+    .info-message{color:#6b4e16;background:#fff7ed;border:1px solid #ffedd5;padding:10px;border-radius:6px}
+
+    .file-upload-area{
+      border:2px dashed var(--border-color);
+      border-radius:8px;
+      padding:40px 20px;
+      text-align:center;
+      background:var(--light-bg);
+      cursor:pointer;
+      transition:border-color .2s, background .2s;
+    }
+    .file-upload-area:hover{
+      border-color:var(--primary-color);
+      background:#f0f7f4;
+    }
+    .file-upload-area.has-file{
+      border-color:var(--primary-color);
+      background:#e9f6f0;
+    }
+    .upload-icon{
+      font-size:48px;
+      color:var(--primary-color);
+      margin-bottom:12px;
+    }
+    .file-name{
+      margin-top:12px;
+      font-weight:600;
+      color:var(--primary-color);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:16px;
+    }
+    th, td{
+      border:1px solid var(--border-color);
+      padding:10px;
+      text-align:left;
+    }
+    th{
+      background:var(--light-bg);
+      font-weight:600;
+    }
+    tr:nth-child(even){
+      background:#fafafa;
+    }
+    .preview-container{
+      max-height:400px;
+      overflow:auto;
+      margin-top:16px;
+    }
+    .json-preview{
+      background:#f8f9fa;
+      border:1px solid var(--border-color);
+      border-radius:6px;
+      padding:16px;
+      font-family:monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+      max-height:400px;
+      overflow:auto;
+    }
+    
+    /* Loading spinner */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: var(--primary-color); animation: spin 1s ease-in-out infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading { display: flex; align-items: center; gap: 8px; }
+    
+    .help-text {
+      background: #f8f9fa;
+      border-left: 3px solid var(--primary-color);
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .help-text ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .help-text li {
+      margin-bottom: 4px;
+    }
+    
+    .date-format-info {
+      background: #e9f6f0;
+      border: 1px solid var(--primary-color);
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    
+    .example-csv-section {
+      background: #e9f6f0;
+      border: 1px solid var(--primary-color);
+      border-radius: 6px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .example-csv-section h3 {
+      margin-top: 0;
+      color: var(--secondary-color);
+    }
+    .example-csv-section code {
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .example-csv-table {
+      width: 100%;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    .example-csv-table th,
+    .example-csv-table td {
+      padding: 6px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    .example-csv-table th {
+      background: #f0f7f4;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      border-color: #6c757d;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      border-color: #545b62;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
@@ -17,27 +179,142 @@
 
   <div id="authCard" class="card">
     <div id="auth-message" class="info-message">Authenticating with PureCloud...</div>
-    <div id="auth-debug" style="display:none; margin-top:10px; padding:10px; background:#f8f9fa; border-radius:6px; font-size:12px; font-family:monospace;"></div>
   </div>
 
   <div id="appContent" style="display:none;">
-    <!-- ... (keep all your existing HTML content exactly as it is) ... -->
+    <div id="messageContainer"></div>
+
+    <!-- Example CSV Section -->
+    <div class="card">
+      <h2 class="section-title">Example CSV Format</h2>
+      <div class="example-csv-section">
+        <p>Download an example CSV file to ensure your data is in the correct format:</p>
+        
+        <table class="example-csv-table">
+          <thead>
+            <tr>
+              <th>UserID</th>
+              <th>UserEmail</th>
+              <th>DateOccurred</th>
+              <th>Value</th>
+              <th>Type</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>08377fd8-3680-4a50-b909-c685e1567659</td>
+              <td>john.doe@company.com</td>
+              <td>03/12/2025</td>
+              <td>95</td>
+              <td>total</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>1a2b3c4d-5678-90ef-ghij-klmnopqrstuv</td>
+              <td>jane.smith@company.com</td>
+              <td>2025-12-02</td>
+              <td>42.5</td>
+              <td>cumulative</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>mike.jones@company.com</td>
+              <td>02/12/2025</td>
+              <td>100</td>
+              <td>total</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="action-buttons">
+          <button id="downloadExampleBtn" class="btn-secondary">📥 Download Example CSV</button>
+          <button id="copyExampleBtn" class="btn-secondary">📋 Copy CSV Format</button>
+        </div>
+        
+        <div class="muted" style="margin-top: 12px;">
+          <strong>Notes:</strong>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+            <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
+            <li><code>DateOccurred</code> can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
+            <li><code>Count</code> field is NOT used by the API but can be included in CSV</li>
+            <li>Column names are case-insensitive (UserID, userid, USERID all work)</li>
+            <li>Remove all empty rows from your CSV file before uploading</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Select Metric</h2>
+      <div class="controls">
+        <div>
+          <label for="metric-select">External Metric</label>
+          <select id="metric-select">
+            <option value="">Select a metric...</option>
+          </select>
+          <div class="muted">Choose the metric to upload data for</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="section-title">Upload CSV File</h2>
+      <div class="date-format-info">
+        <strong>⚠️ Date Format Notice:</strong> Your CSV can use UK format (DD/MM/YYYY) like "03/12/2025". 
+        The app will automatically convert it to ISO format (YYYY-MM-DD) like "2025-12-03" for the API.
+      </div>
+      <div class="help-text">
+        <strong>CSV Format Requirements:</strong>
+        <ul>
+          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID) OR <code>userEmail</code></li>
+          <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
+          <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
+          <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
+          <li><strong>Note:</strong> <code>count</code> field is NOT used in this API</li>
+          <li><strong>Important:</strong> Remove all empty rows from your CSV file</li>
+        </ul>
+        Column names are case-insensitive (userId, userid, USERID all work).
+      </div>
+      <div id="fileUploadArea" class="file-upload-area">
+        <div class="upload-icon">📁</div>
+        <div><strong>Click to upload CSV file</strong></div>
+        <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
+        <div class="muted">Minimum columns: userId/userEmail, dateOccurred, value, type</div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv" style="display:none" />
+      <div id="fileName" class="file-name"></div>
+    </div>
+
+    <div id="csvPreviewCard" class="card" style="display:none;">
+      <h2 class="section-title">CSV Preview</h2>
+      <div id="csvPreview" class="preview-container">
+        <!-- CSV table will be rendered here -->
+      </div>
+      <button id="convertToJsonBtn" class="full-width-btn">Convert to JSON</button>
+    </div>
+
+    <div id="jsonPreviewCard" class="card" style="display:none;">
+      <h2 class="section-title">JSON Preview</h2>
+      <div class="muted" style="margin-bottom: 12px;">Preview of the data that will be uploaded:</div>
+      <div id="jsonPreview" class="json-preview"></div>
+      <button id="uploadDataBtn" class="full-width-btn">Upload Data to PureCloud</button>
+    </div>
+
+    <div id="results" class="card" style="display:none;"></div>
   </div>
 
   <script>
     // ===== OAuth Config =====
     const clientId = 'fe305808-b368-4547-8af9-325d28d552bb';
-    // Try both redirect URIs - one for local dev, one for GitHub Pages
-    const redirectUri = window.location.href.includes('localhost') 
-      ? 'http://localhost:5500/'  // For local testing
-      : 'https://gmcglynn88.github.io/Gamification-Upload/';  // For GitHub Pages
-      
+    const redirectUri = 'https://gmcglynn88.github.io/Gamification-Upload/';
     const oauthUrl = `https://login.mypurecloud.ie/oauth/authorize?client_id=${encodeURIComponent(clientId)}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}`;
 
     console.log('OAuth Configuration:');
     console.log('- Client ID:', clientId);
     console.log('- Redirect URI:', redirectUri);
-    console.log('- Current URL:', window.location.href);
     console.log('- Full OAuth URL:', oauthUrl);
 
     let accessToken = null;
@@ -47,74 +324,12 @@
     let selectedMetricId = null;
 
     // ===== Example CSV Data =====
-    const exampleCSV = `UserID,UserEmail,DateOccurred,Value,Type
-08377fd8-3680-4a50-b909-c685e1567659,john.doe@company.com,03/12/2025,95,total
-1a2b3c4d-5678-90ef-ghij-klmnopqrstuv,jane.smith@company.com,2025-12-02,42.5,cumulative
-,mike.jones@company.com,02/12/2025,100,total
-abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,total
-,admin@company.com,2025-11-30,50.25,cumulative`;
-
-    // ===== Enhanced OAuth Handler =====
-    document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, checking for OAuth response...');
-      
-      const debugDiv = document.getElementById('auth-debug');
-      debugDiv.style.display = 'block';
-      debugDiv.innerHTML = `
-        <strong>Debug Info:</strong><br>
-        URL: ${window.location.href}<br>
-        Hash: ${window.location.hash}<br>
-        Search: ${window.location.search}<br>
-        Redirect URI: ${redirectUri}
-      `;
-
-      // Check URL hash for OAuth response
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      
-      console.log('Hash params:', Object.fromEntries(params.entries()));
-      
-      const access_token = params.get('access_token');
-      const error = params.get('error');
-      const error_description = params.get('error_description');
-
-      if (error) {
-        console.error('OAuth error:', error, error_description);
-        document.getElementById('auth-message').textContent = `OAuth Error: ${error_description || error}`;
-        document.getElementById('auth-message').className = 'error-message';
-        debugDiv.innerHTML += `<br><strong style="color:red">OAuth Error: ${error} - ${error_description}</strong>`;
-        return;
-      }
-
-      if (access_token) {
-        console.log('Access token found in URL hash');
-        accessToken = access_token;
-        sessionStorage.setItem('purecloud_token', accessToken);
-        
-        // Clear the hash from URL
-        window.location.hash = '';
-        
-        debugDiv.innerHTML += `<br><strong style="color:green">Token found! Length: ${accessToken.length} chars</strong>`;
-        document.getElementById('auth-message').textContent = 'Token received, initializing application...';
-        
-        // Initialize app
-        setTimeout(() => initializeApplication(), 500);
-      } else if (sessionStorage.getItem('purecloud_token')) {
-        console.log('Using token from sessionStorage');
-        accessToken = sessionStorage.getItem('purecloud_token');
-        debugDiv.innerHTML += `<br><strong style="color:green">Using cached token from sessionStorage</strong>`;
-        initializeApplication();
-      } else {
-        console.log('No token found, initiating OAuth flow');
-        debugDiv.innerHTML += `<br><strong style="color:orange">No token found, redirecting to OAuth...</strong>`;
-        document.getElementById('auth-message').textContent = 'Redirecting to PureCloud login...';
-        
-        // Give user a moment to see the message before redirect
-        setTimeout(() => {
-          window.location.href = oauthUrl;
-        }, 1000);
-      }
-    });
+    const exampleCSV = `UserID,UserEmail,DateOccurred,Value,Count,Type
+08377fd8-3680-4a50-b909-c685e1567659,john.doe@company.com,03/12/2025,95,,total
+1a2b3c4d-5678-90ef-ghij-klmnopqrstuv,jane.smith@company.com,2025-12-02,42.5,,cumulative
+,mike.jones@company.com,02/12/2025,100,,total
+abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,total
+,admin@company.com,2025-11-30,50.25,,cumulative`;
 
     // ===== Date Format Conversion Functions =====
     function convertToISODate(dateStr) {
@@ -188,6 +403,37 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
              date.getDate() === day;
     }
 
+    // ===== Auth bootstrap =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      const qparams = new URLSearchParams(window.location.search);
+
+      const oauthError = params.get('error') || qparams.get('error');
+      const oauthErrorDesc = params.get('error_description') || qparams.get('error_description');
+
+      if (oauthError) {
+        document.getElementById('auth-message').textContent = `OAuth error: ${oauthErrorDesc || oauthError}`;
+        document.getElementById('auth-message').className = 'error-message';
+        console.error('OAuth error details:', { error: oauthError, description: oauthErrorDesc });
+        return;
+      }
+      
+      accessToken = params.get('access_token');
+
+      if (accessToken) {
+        sessionStorage.setItem('purecloud_token', accessToken);
+        window.location.hash = '';
+        initializeApplication();
+      } else if (sessionStorage.getItem('purecloud_token')) {
+        accessToken = sessionStorage.getItem('purecloud_token');
+        initializeApplication();
+      } else {
+        console.log('Initiating OAuth flow with:', { clientId, redirectUri });
+        window.location.href = oauthUrl;
+      }
+    });
+    
     function showMessage(msg, type='error'){
       const box = document.getElementById('messageContainer');
       box.innerHTML = `<div class="${type}-message">${msg}</div>`;
@@ -196,36 +442,21 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
     }
     
     function initializeApplication() {
-      console.log('Initializing application with token:', accessToken ? 'Token present' : 'No token');
+      document.getElementById('auth-message').textContent = 'Authenticated successfully!';
+      document.getElementById('authCard').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
       
-      if (!accessToken) {
-        console.error('No access token available!');
-        showMessage('Authentication failed. Please refresh the page to try again.', 'error');
-        return;
-      }
+      // Load metrics
+      fetchExternalMetrics();
       
-      document.getElementById('auth-message').textContent = 'Authenticated successfully! Loading metrics...';
-      setTimeout(() => {
-        document.getElementById('authCard').style.display = 'none';
-        document.getElementById('appContent').style.display = 'block';
-        
-        // Load metrics
-        fetchExternalMetrics();
-        
-        // Setup event listeners
-        setupEventListeners();
-      }, 1000);
+      // Setup event listeners
+      setupEventListeners();
     }
     
     function setupEventListeners() {
       // Example CSV download button
-      document.getElementById('downloadExampleBtn').addEventListener('click', function() {
-        downloadExampleCSV();
-      });
-      
-      document.getElementById('copyExampleBtn').addEventListener('click', function() {
-        copyExampleFormat();
-      });
+      document.getElementById('downloadExampleBtn').addEventListener('click', downloadExampleCSV);
+      document.getElementById('copyExampleBtn').addEventListener('click', copyExampleFormat);
       
       // File upload area click
       document.getElementById('fileUploadArea').addEventListener('click', () => {
@@ -264,7 +495,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       // Metric select change
       document.getElementById('metric-select').addEventListener('change', (e) => {
         selectedMetricId = e.target.value;
-        console.log('Selected metric:', selectedMetricId);
         if (jsonData && selectedMetricId) {
           updateJsonPreview();
         }
@@ -279,96 +509,34 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
     
     // Download example CSV file
     function downloadExampleCSV() {
-      try {
-        const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'gamification_example.csv';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-        
-        showMessage('Example CSV file downloaded successfully!', 'success');
-      } catch (error) {
-        console.error('Error downloading CSV:', error);
-        showMessage('Error downloading example CSV. Please try again.', 'error');
-      }
+      const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'gamification_example.csv';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Example CSV file downloaded successfully!', 'success');
     }
     
     // Copy example format to clipboard
     function copyExampleFormat() {
-      const textArea = document.createElement('textarea');
-      textArea.value = exampleCSV;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
+      navigator.clipboard.writeText(exampleCSV)
+        .then(() => {
           showMessage('CSV format copied to clipboard!', 'success');
-        } else {
-          throw new Error('Copy command failed');
-        }
-      } catch (err) {
-        console.error('Failed to copy: ', err);
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(exampleCSV)
-            .then(() => {
-              showMessage('CSV format copied to clipboard!', 'success');
-            })
-            .catch(clipboardErr => {
-              console.error('Clipboard API error: ', clipboardErr);
-              showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-            });
-        } else {
-          showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-        }
-      } finally {
-        document.body.removeChild(textArea);
-      }
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          showMessage('Failed to copy to clipboard', 'error');
+        });
     }
     
-    // Fetch external metrics from API - FIXED with better error handling
+    // Fetch external metrics from API
     async function fetchExternalMetrics() {
       try {
-        console.log('Fetching external metrics with token:', accessToken ? 'Token exists' : 'No token');
-        
-        if (!accessToken) {
-          throw new Error('No access token available. Please authenticate first.');
-        }
-        
-        // Test the token first with a simple API call
-        const testResponse = await fetch('https://api.mypurecloud.ie/api/v2/authorization/me', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!testResponse.ok) {
-          const errorText = await testResponse.text();
-          console.error('Token test failed:', testResponse.status, errorText);
-          
-          if (testResponse.status === 401) {
-            // Token is invalid, clear it and restart auth
-            sessionStorage.removeItem('purecloud_token');
-            showMessage('Session expired. Please refresh the page to re-authenticate.', 'error');
-            return;
-          }
-          
-          throw new Error(`Token validation failed: HTTP ${testResponse.status}`);
-        }
-        
-        console.log('Token is valid, fetching metrics...');
-        
+        console.log('Fetching external metrics...');
         const response = await fetch('https://api.mypurecloud.ie/api/v2/employeeperformance/externalmetrics/definitions', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -376,17 +544,16 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           }
         });
         
-        console.log('Metrics response status:', response.status);
+        console.log('External metrics response status:', response.status);
         
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Metrics API error:', response.status, errorText);
           throw new Error(`HTTP ${response.status}: ${errorText}`);
         }
         
         const data = await response.json();
         const metrics = data.entities || [];
-        console.log(`Found ${metrics.length} external metrics:`, metrics);
+        console.log(`Found ${metrics.length} external metrics`);
         
         const metricSelect = document.getElementById('metric-select');
         
@@ -406,8 +573,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
         
         if (metrics.length === 0) {
           showMessage('No external metrics found. Please create metrics in PureCloud first.', 'info');
-        } else {
-          showMessage(`Loaded ${metrics.length} metrics successfully.`, 'success');
         }
         
       } catch (error) {
@@ -416,8 +581,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       }
     }
     
-    // ===== FILE HANDLING FUNCTIONS =====
-    // ... (keep all your existing file handling functions EXACTLY as they are) ...
     // Handle file selection
     function handleFileSelect(e) {
       const file = e.target.files[0];
@@ -459,26 +622,16 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       reader.readAsText(file);
     }
     
-    // ULTRA ROBUST CSV PARSER - specifically for your Excel-style CSV
+    // Improved CSV parsing with better empty row handling
     function parseCSV(csvText) {
       try {
-        // Log raw input for debugging
-        console.log('Raw CSV text first 500 chars:', csvText.substring(0, 500));
-        
-        // Handle BOM and different line endings
+        // Handle different line endings and BOM (byte order mark)
         let text = csvText;
-        
-        // Remove BOM if present
-        if (text.charCodeAt(0) === 0xFEFF || text.charCodeAt(0) === 0xFFFE) {
-          text = text.substring(1);
+        if (text.charCodeAt(0) === 0xFEFF) {
+          text = text.substring(1); // Remove BOM if present
         }
         
-        // Replace different line endings with \n
-        text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        
-        const lines = text.split('\n');
-        console.log('Total lines found:', lines.length);
-        
+        const lines = text.split(/\r\n|\n|\r/);
         if (lines.length === 0) {
           showMessage('CSV file is empty', 'error');
           return;
@@ -493,56 +646,52 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           }
         }
         
-        // Get the header line
-        const headerLine = lines[headerLineIndex];
-        console.log('Header line raw:', headerLine);
-        
-        // SPECIAL FIX: For Excel CSVs that might have the entire line in quotes or other issues
-        // Let's split by comma but be smart about it
-        let headers = [];
-        
-        // Try multiple parsing strategies
-        if (headerLine.includes('"')) {
-          // Handle quoted headers
-          headers = headerLine.match(/(?:[^,"]+|"[^"]*")+/g) || [];
-          headers = headers.map(h => h.replace(/^"|"$/g, '').trim());
-        } else {
-          // Simple split for unquoted headers
-          headers = headerLine.split(',').map(h => h.trim());
-        }
-        
-        // Clean up headers - remove any empty ones
-        headers = headers.filter(h => h.length > 0);
+        // Get headers from first non-empty line and clean them
+        const headers = lines[headerLineIndex].split(',').map(h => h.trim().replace(/"/g, ''));
         
         console.log('Headers found:', headers);
-        console.log('Number of headers:', headers.length);
+        console.log('Header line index:', headerLineIndex);
         
-        // Parse data rows
+        // Parse data rows, skipping empty rows and rows that are completely empty
         csvData = [];
         
         for (let i = headerLineIndex + 1; i < lines.length; i++) {
           const line = lines[i].trim();
           
-          // Skip empty lines
-          if (!line || line === '' || line.replace(/,/g, '').trim().length === 0) {
+          // Skip if line is empty or contains only commas
+          if (!line || line.replace(/,/g, '').trim().length === 0) {
+            console.log(`Skipping empty line at row ${i + 1}`);
             continue;
           }
           
-          console.log(`Processing line ${i}:`, line);
+          // Simple CSV parsing that handles quoted values
+          const values = [];
+          let inQuotes = false;
+          let currentValue = '';
           
-          let values = [];
-          
-          // Try different parsing strategies for data rows too
-          if (line.includes('"')) {
-            // Handle quoted values
-            values = line.match(/(?:[^,"]+|"[^"]*")+/g) || [];
-            values = values.map(v => v.replace(/^"|"$/g, '').trim());
-          } else {
-            // Simple split for unquoted values
-            values = line.split(',').map(v => v.trim());
+          for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            const nextChar = line[j + 1];
+            
+            if (char === '"' && !inQuotes) {
+              inQuotes = true;
+            } else if (char === '"' && inQuotes && nextChar === '"') {
+              currentValue += '"';
+              j++; // Skip next quote
+            } else if (char === '"' && inQuotes) {
+              inQuotes = false;
+            } else if (char === ',' && !inQuotes) {
+              values.push(currentValue.trim().replace(/"/g, ''));
+              currentValue = '';
+            } else {
+              currentValue += char;
+            }
           }
           
-          // Ensure we have enough values for all headers
+          // Add the last value
+          values.push(currentValue.trim().replace(/"/g, ''));
+          
+          // Pad values if needed
           while (values.length < headers.length) {
             values.push('');
           }
@@ -551,38 +700,35 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           const row = {};
           let hasData = false;
           
-          for (let j = 0; j < headers.length; j++) {
-            const header = headers[j];
-            const value = values[j] || '';
+          headers.forEach((header, index) => {
+            const value = values[index] || '';
             row[header] = value;
-            
-            if (value && value.trim().length > 0) {
-              hasData = true;
-            }
-          }
+            if (value && value.trim().length > 0) hasData = true;
+          });
           
-          // Log the parsed row for debugging
-          console.log(`Row ${csvData.length + 1}:`, row);
-          
+          // Only add row if it has data
           if (hasData) {
+            console.log(`Adding row ${csvData.length + 1}:`, row);
             csvData.push(row);
+          } else {
+            console.log(`Skipping data-less row at line ${i + 1}`);
           }
         }
         
         if (csvData.length === 0) {
-          showMessage('No valid data found in CSV file. Please ensure your CSV has data rows.', 'error');
+          showMessage('No valid data found in CSV file', 'error');
           return;
         }
         
-        console.log(`Successfully parsed ${csvData.length} valid rows from CSV`);
-        console.log('First row data:', csvData[0]);
+        console.log(`Parsed ${csvData.length} valid rows from CSV`);
+        console.log('First row:', csvData[0]);
         
         // Show preview
         showCSVPreview(headers, csvData);
         
       } catch (error) {
         console.error('Error parsing CSV:', error);
-        showMessage(`Error parsing CSV: ${error.message}. Please ensure your CSV is properly formatted.`, 'error');
+        showMessage(`Error parsing CSV: ${error.message}`, 'error');
       }
     }
     
@@ -639,7 +785,7 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       document.getElementById('csvPreviewCard').style.display = 'block';
     }
     
-    // Convert CSV data to JSON - UPDATED TO HANDLE MISSPELLED "DateOccured"
+    // Convert CSV data to JSON
     function convertToJson() {
       const metricSelect = document.getElementById('metric-select');
       if (!metricSelect.value) {
@@ -652,46 +798,32 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
         const items = [];
         let validationErrors = [];
         
-        console.log('Converting CSV to JSON. CSV data:', csvData);
-        
         csvData.forEach((row, index) => {
           try {
-            // Log the row being processed
-            console.log(`Processing row ${index}:`, row);
-            
             // Normalize column names (case-insensitive)
             const normalizedRow = {};
             Object.keys(row).forEach(key => {
               normalizedRow[key.toLowerCase()] = row[key];
             });
             
-            console.log(`Normalized row ${index}:`, normalizedRow);
-            
             // Get values with fallbacks for different column names
             const userId = normalizedRow.userid || normalizedRow.user_id || '';
             const userEmail = normalizedRow.useremail || normalizedRow.user_email || normalizedRow.email || '';
-            
-            // FIX: Handle both "dateoccurred" (correct) and "dateoccured" (misspelled)
-            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.dateoccured || normalizedRow.date_occurred || normalizedRow.date || '';
-            
+            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.date_occurred || normalizedRow.date || '';
             const value = normalizedRow.value || '0';
             const type = normalizedRow.type || '';
             
-            console.log(`Row ${index} values:`, { userId, userEmail, dateOccurredRaw, value, type });
-            
             // Validate required fields
             if (!userId && !userEmail) {
-              throw new Error(`Row ${index + 2}: Either UserID or UserEmail is required`);
+              throw new Error(`Row ${index + 2}: Either userId or userEmail is required`);
             }
             
             if (!dateOccurredRaw) {
-              throw new Error(`Row ${index + 2}: DateOccurred is required. Found columns: ${Object.keys(normalizedRow).join(', ')}`);
+              throw new Error(`Row ${index + 2}: dateOccurred is required`);
             }
             
             // Convert date format from UK (DD/MM/YYYY) to ISO (YYYY-MM-DD)
             const dateOccurredISO = convertToISODate(dateOccurredRaw);
-            console.log(`Row ${index} date conversion: "${dateOccurredRaw}" -> "${dateOccurredISO}"`);
-            
             if (!validateISODate(dateOccurredISO)) {
               throw new Error(`Row ${index + 2}: Invalid date format. Use DD/MM/YYYY or YYYY-MM-DD. Got: "${dateOccurredRaw}"`);
             }
@@ -699,17 +831,17 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             // Validate type field
             const normalizedType = type.toLowerCase().trim();
             if (!normalizedType) {
-              throw new Error(`Row ${index + 2}: Type is required and must be "Total" or "Cumulative"`);
+              throw new Error(`Row ${index + 2}: type is required and must be "Total" or "Cumulative"`);
             }
             
             if (normalizedType !== 'total' && normalizedType !== 'cumulative') {
-              throw new Error(`Row ${index + 2}: Type must be "Total" or "Cumulative" (got: "${type}")`);
+              throw new Error(`Row ${index + 2}: type must be "Total" or "Cumulative" (got: "${type}")`);
             }
             
             // Parse numeric value
             const parsedValue = parseFloat(value);
             if (isNaN(parsedValue)) {
-              throw new Error(`Row ${index + 2}: Value must be a number (got: "${value}")`);
+              throw new Error(`Row ${index + 2}: value must be a number (got: "${value}")`);
             }
             
             // Create item according to the correct JSON structure
@@ -727,11 +859,11 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
               item.userEmail = userEmail;
             }
             
-            console.log(`Created item for row ${index}:`, item);
+            // Note: count field is NOT included as it's not in your example JSON
+            
             items.push(item);
             
           } catch (rowError) {
-            console.error(`Error in row ${index}:`, rowError.message);
             validationErrors.push(rowError.message);
           }
         });
@@ -750,6 +882,10 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
         
         console.log(`Converted ${items.length} rows to JSON`);
         console.log('Sample JSON item:', items[0]);
+        console.log('Date conversion example:', {
+          input: csvData[0].dateOccurred || csvData[0].dateoccurred || csvData[0].date,
+          output: items[0].dateOccurred
+        });
         
         // Update JSON preview
         updateJsonPreview();
@@ -799,15 +935,10 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       jsonPreview.parentNode.appendChild(countInfo);
     }
     
-    // Upload data to PureCloud - FIXED with better token validation
+    // Upload data to PureCloud
     async function uploadDataToPureCloud() {
       if (!jsonData || !selectedMetricId) {
         showMessage('No data to upload', 'error');
-        return;
-      }
-      
-      if (!accessToken) {
-        showMessage('Authentication required. Please refresh the page to re-authenticate.', 'error');
         return;
       }
       
@@ -828,7 +959,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
         
         console.log(`Uploading ${jsonData.items.length} items to PureCloud...`);
         console.log('Sample data being sent:', jsonData.items[0]);
-        console.log('Using access token (first 20 chars):', accessToken.substring(0, 20) + '...');
         
         // Make API call
         const response = await fetch('https://api.mypurecloud.ie/api/v2/employeeperformance/externalmetrics/data', {
@@ -840,20 +970,9 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           body: JSON.stringify(jsonData)
         });
         
-        console.log('Upload response status:', response.status);
-        
-        const responseText = await response.text();
-        console.log('Upload response text:', responseText);
-        
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (e) {
-          data = { message: responseText };
-        }
+        const data = await response.json().catch(() => ({}));
         
         if (!response.ok) {
-          console.error('Upload failed with data:', data);
           throw new Error(data.message || `HTTP ${response.status}: ${JSON.stringify(data)}`);
         }
         
@@ -862,8 +981,8 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           <div class="success-message">
             ✅ Successfully uploaded ${jsonData.items.length} metric data points!
           </div>
-          <div class="warning-note" style="margin-top: 12px;">
-            <strong>⚠️ Important:</strong> Data has been submitted to Genesys and cannot be reverted.
+          <div class="muted" style="margin-top: 12px;">
+            The data has been submitted to the external metrics system.
           </div>
         `;
         
