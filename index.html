@@ -153,18 +153,17 @@
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
       <div class="date-format-info">
-        <strong>⚠️ Date Format Notice:</strong> Your CSV can use UK format (DD/MM/YYYY) like "03/12/2025". 
-        The app will automatically convert it to ISO format (YYYY-MM-DD) like "2025-12-03" for the API.
+        <strong>⚠️ Your file must be saved as a .csv file.
       </div>
       <div class="help-text">
         <strong>CSV Format Requirements:</strong>
         <ul>
-          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID)</li>
+          <li><strong>Optional:</strong> <code>userId</code> (can be used instead of userEmail)</li>
+          <li><strong>Optional:</strong> <code>userEmail</code> (can be used instead of userId)</li>
           <li><strong>Optional:</strong> <code>userEmail</code> (can be used instead of userId)</li>
           <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
           <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
           <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
-          <li><strong>Note:</strong> <code>count</code> field is NOT used in this API</li>
         </ul>
         Column names are case-insensitive (userId, userid, USERID all work).
       </div>
