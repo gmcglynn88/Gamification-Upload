@@ -198,7 +198,6 @@
               <th>DateOccurred</th>
               <th>Value</th>
               <th>Type</th>
-              <th>Count</th>
             </tr>
           </thead>
           <tbody>
@@ -208,7 +207,6 @@
               <td>03/12/2025</td>
               <td>95</td>
               <td>total</td>
-              <td></td>
             </tr>
             <tr>
               <td>1a2b3c4d-5678-90ef-ghij-klmnopqrstuv</td>
@@ -216,7 +214,6 @@
               <td>2025-12-02</td>
               <td>42.5</td>
               <td>cumulative</td>
-              <td></td>
             </tr>
             <tr>
               <td></td>
@@ -224,7 +221,6 @@
               <td>02/12/2025</td>
               <td>100</td>
               <td>total</td>
-              <td></td>
             </tr>
           </tbody>
         </table>
@@ -235,13 +231,14 @@
         </div>
         
         <div class="muted" style="margin-top: 12px;">
-          <strong>Notes:</strong>
+          <strong>Important Notes:</strong>
           <ul style="margin: 8px 0 0 0; padding-left: 20px;">
             <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
             <li><code>DateOccurred</code> can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
-            <li><code>Count</code> field is NOT used by the API but can be included in CSV</li>
+            <li>Do NOT include empty columns or extra commas at the end of rows</li>
             <li>Column names are case-insensitive (UserID, userid, USERID all work)</li>
             <li>Remove all empty rows from your CSV file before uploading</li>
+            <li>Save your CSV in UTF-8 format for best compatibility</li>
           </ul>
         </div>
       </div>
@@ -263,8 +260,13 @@
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
       <div class="date-format-info">
-        <strong>⚠️ Date Format Notice:</strong> Your CSV can use UK format (DD/MM/YYYY) like "03/12/2025". 
-        The app will automatically convert it to ISO format (YYYY-MM-DD) like "2025-12-03" for the API.
+        <strong>⚠️ Important CSV Format Notice:</strong>
+        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+          <li>Your CSV should have exactly 5 columns: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li>Do NOT include extra empty columns at the end</li>
+          <li>Remove all empty rows before and after your data</li>
+          <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
+        </ul>
       </div>
       <div class="help-text">
         <strong>CSV Format Requirements:</strong>
@@ -273,8 +275,7 @@
           <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
           <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
           <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
-          <li><strong>Note:</strong> <code>count</code> field is NOT used in this API</li>
-          <li><strong>Important:</strong> Remove all empty rows from your CSV file</li>
+          <li><strong>Note:</strong> The <code>count</code> field is NOT used in this API</li>
         </ul>
         Column names are case-insensitive (userId, userid, USERID all work).
       </div>
@@ -282,7 +283,7 @@
         <div class="upload-icon">📁</div>
         <div><strong>Click to upload CSV file</strong></div>
         <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
-        <div class="muted">Minimum columns: userId/userEmail, dateOccurred, value, type</div>
+        <div class="muted">Required columns: userId/userEmail, dateOccurred, value, type</div>
       </div>
       <input type="file" id="fileInput" accept=".csv" style="display:none" />
       <div id="fileName" class="file-name"></div>
@@ -324,12 +325,12 @@
     let selectedMetricId = null;
 
     // ===== Example CSV Data =====
-    const exampleCSV = `UserID,UserEmail,DateOccurred,Value,Count,Type
-08377fd8-3680-4a50-b909-c685e1567659,john.doe@company.com,03/12/2025,95,,total
-1a2b3c4d-5678-90ef-ghij-klmnopqrstuv,jane.smith@company.com,2025-12-02,42.5,,cumulative
-,mike.jones@company.com,02/12/2025,100,,total
-abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,total
-,admin@company.com,2025-11-30,50.25,,cumulative`;
+    const exampleCSV = `UserID,UserEmail,DateOccurred,Value,Type
+08377fd8-3680-4a50-b909-c685e1567659,john.doe@company.com,03/12/2025,95,total
+1a2b3c4d-5678-90ef-ghij-klmnopqrstuv,jane.smith@company.com,2025-12-02,42.5,cumulative
+,mike.jones@company.com,02/12/2025,100,total
+abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,total
+,admin@company.com,2025-11-30,50.25,cumulative`;
 
     // ===== Date Format Conversion Functions =====
     function convertToISODate(dateStr) {
@@ -622,7 +623,7 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,tot
       reader.readAsText(file);
     }
     
-    // Improved CSV parsing with better empty row handling
+    // Improved CSV parsing that handles Excel-style CSVs with trailing commas
     function parseCSV(csvText) {
       try {
         // Handle different line endings and BOM (byte order mark)
@@ -646,42 +647,45 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,tot
           }
         }
         
-        // Get headers from first non-empty line and clean them
-        const headers = lines[headerLineIndex].split(',').map(h => h.trim().replace(/"/g, ''));
+        // Get headers - use simple split for headers
+        const headerLine = lines[headerLineIndex];
+        const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, ''));
         
         console.log('Headers found:', headers);
-        console.log('Header line index:', headerLineIndex);
+        console.log('Header line:', headerLine);
         
-        // Parse data rows, skipping empty rows and rows that are completely empty
+        // Parse data rows
         csvData = [];
         
         for (let i = headerLineIndex + 1; i < lines.length; i++) {
-          const line = lines[i].trim();
+          let line = lines[i];
           
           // Skip if line is empty or contains only commas
           if (!line || line.replace(/,/g, '').trim().length === 0) {
-            console.log(`Skipping empty line at row ${i + 1}`);
             continue;
           }
           
-          // Simple CSV parsing that handles quoted values
+          // Clean up the line - remove trailing commas that Excel might add
+          line = line.replace(/,+$/, '');
+          
+          // Split by comma, but handle quoted values
           const values = [];
-          let inQuotes = false;
           let currentValue = '';
+          let insideQuotes = false;
           
           for (let j = 0; j < line.length; j++) {
             const char = line[j];
             const nextChar = line[j + 1];
             
-            if (char === '"' && !inQuotes) {
-              inQuotes = true;
-            } else if (char === '"' && inQuotes && nextChar === '"') {
+            if (char === '"' && !insideQuotes) {
+              insideQuotes = true;
+            } else if (char === '"' && insideQuotes && nextChar === '"') {
               currentValue += '"';
               j++; // Skip next quote
-            } else if (char === '"' && inQuotes) {
-              inQuotes = false;
-            } else if (char === ',' && !inQuotes) {
-              values.push(currentValue.trim().replace(/"/g, ''));
+            } else if (char === '"' && insideQuotes) {
+              insideQuotes = false;
+            } else if (char === ',' && !insideQuotes) {
+              values.push(currentValue.trim());
               currentValue = '';
             } else {
               currentValue += char;
@@ -689,29 +693,26 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,tot
           }
           
           // Add the last value
-          values.push(currentValue.trim().replace(/"/g, ''));
+          values.push(currentValue.trim());
           
-          // Pad values if needed
-          while (values.length < headers.length) {
-            values.push('');
-          }
-          
-          // Create row object
+          // Create row object, mapping values to headers
           const row = {};
           let hasData = false;
           
-          headers.forEach((header, index) => {
-            const value = values[index] || '';
+          for (let j = 0; j < Math.min(headers.length, values.length); j++) {
+            const header = headers[j];
+            const value = values[j] || '';
             row[header] = value;
-            if (value && value.trim().length > 0) hasData = true;
-          });
+            
+            // Check if this row has any non-empty data
+            if (value && value.trim().length > 0) {
+              hasData = true;
+            }
+          }
           
           // Only add row if it has data
           if (hasData) {
-            console.log(`Adding row ${csvData.length + 1}:`, row);
             csvData.push(row);
-          } else {
-            console.log(`Skipping data-less row at line ${i + 1}`);
           }
         }
         
@@ -859,8 +860,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,tot
               item.userEmail = userEmail;
             }
             
-            // Note: count field is NOT included as it's not in your example JSON
-            
             items.push(item);
             
           } catch (rowError) {
@@ -882,10 +881,6 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,tot
         
         console.log(`Converted ${items.length} rows to JSON`);
         console.log('Sample JSON item:', items[0]);
-        console.log('Date conversion example:', {
-          input: csvData[0].dateOccurred || csvData[0].dateoccurred || csvData[0].date,
-          output: items[0].dateOccurred
-        });
         
         // Update JSON preview
         updateJsonPreview();
