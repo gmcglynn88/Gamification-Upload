@@ -25,12 +25,10 @@
     .full-width-btn{width:100%;padding:14px 18px;font-size:16px;margin-top:12px}
     .muted{color:var(--text-light);font-size:12px}
     .section-title{margin:0 0 10px;color:var(--secondary-color)}
-
     #messageContainer{display:none;margin-top:12px}
     .error-message{color:#b4231a;background:#fee2e2;border:1px solid #fecaca;padding:10px;border-radius:6px}
     .success-message{color:#14532d;background:#dcfce7;border:1px solid #bbf7d0;padding:10px;border-radius:6px}
     .info-message{color:#6b4e16;background:#fff7ed;border:1px solid #ffedd5;padding:10px;border-radius:6px}
-
     .file-upload-area{
       border:2px dashed var(--border-color);
       border-radius:8px;
@@ -58,7 +56,6 @@
       font-weight:600;
       color:var(--primary-color);
     }
-
     table{
       width:100%;
       border-collapse:collapse;
@@ -92,97 +89,26 @@
       max-height:400px;
       overflow:auto;
     }
-    
-    /* Loading spinner */
     .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: var(--primary-color); animation: spin 1s ease-in-out infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading { display: flex; align-items: center; gap: 8px; }
-    
-    .help-text {
-      background: #f8f9fa;
-      border-left: 3px solid var(--primary-color);
-      padding: 12px;
-      margin: 12px 0;
-      font-size: 14px;
-    }
-    .help-text ul {
-      margin: 8px 0;
-      padding-left: 20px;
-    }
-    .help-text li {
-      margin-bottom: 4px;
-    }
-    
-    .date-format-info {
-      background: #e9f6f0;
-      border: 1px solid var(--primary-color);
-      border-radius: 6px;
-      padding: 12px;
-      margin: 12px 0;
-      font-size: 14px;
-    }
-    
-    .example-csv-section {
-      background: #e9f6f0;
-      border: 1px solid var(--primary-color);
-      border-radius: 6px;
-      padding: 16px;
-      margin: 16px 0;
-    }
-    .example-csv-section h3 {
-      margin-top: 0;
-      color: var(--secondary-color);
-    }
-    .example-csv-section code {
-      background: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 12px;
-      border: 1px solid var(--border-color);
-    }
-    .example-csv-table {
-      width: 100%;
-      margin: 12px 0;
-      font-size: 12px;
-    }
-    .example-csv-table th,
-    .example-csv-table td {
-      padding: 6px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    .example-csv-table th {
-      background: #f0f7f4;
-    }
-    .btn-secondary {
-      background: #6c757d;
-      border-color: #6c757d;
-    }
-    .btn-secondary:hover {
-      background: #5a6268;
-      border-color: #545b62;
-    }
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    
-    .warning-note {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 6px;
-      padding: 12px;
-      margin: 12px 0;
-      font-size: 14px;
-      color: #856404;
-    }
-    .warning-note strong {
-      color: #856404;
-    }
+    .help-text { background: #f8f9fa; border-left: 3px solid var(--primary-color); padding: 12px; margin: 12px 0; font-size: 14px; }
+    .help-text ul { margin: 8px 0; padding-left: 20px; }
+    .help-text li { margin-bottom: 4px; }
+    .date-format-info { background: #e9f6f0; border: 1px solid var(--primary-color); border-radius: 6px; padding: 12px; margin: 12px 0; font-size: 14px; }
+    .example-csv-section { background: #e9f6f0; border: 1px solid var(--primary-color); border-radius: 6px; padding: 16px; margin: 16px 0; }
+    .example-csv-section h3 { margin-top: 0; color: var(--secondary-color); }
+    .example-csv-section code { background: #fff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 12px; border: 1px solid var(--border-color); }
+    .example-csv-table { width: 100%; margin: 12px 0; font-size: 12px; }
+    .example-csv-table th, .example-csv-table td { padding: 6px; border: 1px solid #ccc; text-align: left; }
+    .example-csv-table th { background: #f0f7f4; }
+    .btn-secondary { background: #6c757d; border-color: #6c757d; }
+    .btn-secondary:hover { background: #5a6268; border-color: #545b62; }
+    .action-buttons { display: flex; gap: 12px; margin-top: 12px; }
+    .warning-note { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 12px; margin: 12px 0; font-size: 14px; color: #856404; }
   </style>
 </head>
+
 <body>
   <div id="logo-container">
     <img id="logo" src="https://raw.githubusercontent.com/gmcglynn88/Management-Unit-Search/main/Consultinglogo%20(2).png" alt="Company Logo">
@@ -202,7 +128,7 @@
       <h2 class="section-title">Example CSV Format</h2>
       <div class="example-csv-section">
         <p>Download an example CSV file to ensure your data is in the correct format:</p>
-        
+
         <table class="example-csv-table">
           <thead>
             <tr>
@@ -237,18 +163,19 @@
             </tr>
           </tbody>
         </table>
-        
+
         <div class="action-buttons">
           <button id="downloadExampleBtn" class="btn-secondary">📥 Download Example CSV</button>
           <button id="copyExampleBtn" class="btn-secondary">📋 Copy CSV Format</button>
         </div>
-        
+
         <div class="muted" style="margin-top: 12px;">
           Save your CSV in UTF-8 format for best compatibility
         </div>
       </div>
     </div>
 
+    <!-- Metric Select -->
     <div class="card">
       <h2 class="section-title">Select Metric</h2>
       <div class="controls">
@@ -262,29 +189,26 @@
       </div>
     </div>
 
+    <!-- CSV Upload -->
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
       <div class="date-format-info">
         <strong>CSV Format Requirements:</strong>
         <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-          <li>Your CSV should have exactly 5 header columns <strong>Only</strong>: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li>Your CSV should have 5 header columns: UserID, UserEmail, DateOccurred, Value, Type</li>
           <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
           <li>Either UserID OR Email Address required</li>
-          <li>Once Data has been submitted to Genesys, it cannot be reverted</li>
-          <li>Type is either 'Total' or 'Cumulative' depending on the metric calculation needed</li>
         </ul>
       </div>
-      
+
       <div class="warning-note">
-        <strong>⚠️ Important:</strong> Ensure your CSV has separate columns (not all data in one column). 
-        Open your CSV in a text editor to verify it has commas between values.
+        <strong>⚠️ Important:</strong> Ensure your CSV has separate columns (not all data in one column).
       </div>
-      
+
       <div id="fileUploadArea" class="file-upload-area">
         <div class="upload-icon">📁</div>
         <div><strong>Click to upload CSV file</strong></div>
         <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
-        <div class="muted">Required columns: UserID/UserEmail, DateOccurred, Value, Type</div>
       </div>
       <input type="file" id="fileInput" accept=".csv" style="display:none" />
       <div id="fileName" class="file-name"></div>
@@ -292,15 +216,12 @@
 
     <div id="csvPreviewCard" class="card" style="display:none;">
       <h2 class="section-title">CSV Preview</h2>
-      <div id="csvPreview" class="preview-container">
-        <!-- CSV table will be rendered here -->
-      </div>
+      <div id="csvPreview" class="preview-container"></div>
       <button id="convertToJsonBtn" class="full-width-btn">Convert to JSON</button>
     </div>
 
     <div id="jsonPreviewCard" class="card" style="display:none;">
       <h2 class="section-title">JSON Preview</h2>
-      <div class="muted" style="margin-bottom: 12px;">Preview of the data that will be uploaded:</div>
       <div id="jsonPreview" class="json-preview"></div>
       <button id="uploadDataBtn" class="full-width-btn">Upload Data to PureCloud</button>
     </div>
@@ -308,24 +229,10 @@
     <div id="results" class="card" style="display:none;"></div>
   </div>
 
-  <script>
-    // ===== OAuth Config =====
-    const clientId = 'fe305808-b368-4547-8af9-325d28d552bb';
-    const redirectUri = 'https://gmcglynn88.github.io/Gamification-Upload/';
-    const oauthUrl = `https://login.mypurecloud.ie/oauth/authorize?client_id=${encodeURIComponent(clientId)}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-    console.log('OAuth Configuration:');
-    console.log('- Client ID:', clientId);
-    console.log('- Redirect URI:', redirectUri);
-    console.log('- Full OAuth URL:', oauthUrl);
-
-    let accessToken = null;
-    let selectedFile = null;
-    let csvData = [];
-    let jsonData = null;
-    let selectedMetricId = null;
-
-    // ===== Example CSV Data =====
+<script>
+/* =========================================================================
+   ✔ UPDATED EXAMPLE CSV — SEMICOLON DELIMITED (Excel UK-friendly)
+   ========================================================================= */
 const exampleCSV = `UserID;UserEmail;DateOccurred;Value;Type
 08377fd8-3680-4a50-b909-c685e1567659;john.doe@company.com;03/12/2025;95;total
 1a2b3c4d-5678-90ef-ghij-klmnopqrstuv;jane.smith@company.com;2025-12-02;42.5;cumulative
@@ -333,188 +240,9 @@ const exampleCSV = `UserID;UserEmail;DateOccurred;Value;Type
 abc12345-6789-1011-1213-141516171819;sarah.wilson@company.com;01/12/2025;75;total
 ;admin@company.com;2025-11-30;50.25;cumulative`;
 
-    // ===== Date Format Conversion Functions =====
-    function convertToISODate(dateStr) {
-      if (!dateStr) return '';
-      
-      // Trim and clean the date string
-      dateStr = dateStr.trim();
-      
-      // Check if it's already in ISO format (YYYY-MM-DD)
-      const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (isoRegex.test(dateStr)) {
-        return dateStr; // Already in correct format
-      }
-      
-      // Try UK format (DD/MM/YYYY or DD-MM-YYYY)
-      const ukRegex1 = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/;
-      const ukRegex2 = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/; // For YY format
-      
-      let match = dateStr.match(ukRegex1);
-      if (match) {
-        const day = match[1].padStart(2, '0');
-        const month = match[2].padStart(2, '0');
-        const year = match[3];
-        return `${year}-${month}-${day}`;
-      }
-      
-      match = dateStr.match(ukRegex2);
-      if (match) {
-        const day = match[1].padStart(2, '0');
-        const month = match[2].padStart(2, '0');
-        const year = '20' + match[3].padStart(2, '0'); // Assuming 20xx
-        return `${year}-${month}-${day}`;
-      }
-      
-      // Try other common formats
-      const usRegex = /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/; // MM/DD/YYYY
-      match = dateStr.match(usRegex);
-      if (match) {
-        const month = match[1].padStart(2, '0');
-        const day = match[2].padStart(2, '0');
-        const year = match[3];
-        return `${year}-${month}-${day}`;
-      }
-      
-      // If no pattern matches, return the original string
-      console.warn(`Could not parse date format: "${dateStr}"`);
-      return dateStr;
-    }
-    
-    function validateISODate(dateStr) {
-      if (!dateStr) return false;
-      
-      const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!isoRegex.test(dateStr)) return false;
-      
-      // Basic validation of date components
-      const parts = dateStr.split('-');
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10);
-      const day = parseInt(parts[2], 10);
-      
-      if (year < 2000 || year > 2100) return false;
-      if (month < 1 || month > 12) return false;
-      if (day < 1 || day > 31) return false;
-      
-      // More detailed validation
-      const date = new Date(dateStr);
-      return date instanceof Date && !isNaN(date) && 
-             date.getFullYear() === year &&
-             date.getMonth() + 1 === month &&
-             date.getDate() === day;
-    }
-
-    // ===== Auth bootstrap =====
-    document.addEventListener('DOMContentLoaded', () => {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      const qparams = new URLSearchParams(window.location.search);
-
-      const oauthError = params.get('error') || qparams.get('error');
-      const oauthErrorDesc = params.get('error_description') || qparams.get('error_description');
-
-      if (oauthError) {
-        document.getElementById('auth-message').textContent = `OAuth error: ${oauthErrorDesc || oauthError}`;
-        document.getElementById('auth-message').className = 'error-message';
-        console.error('OAuth error details:', { error: oauthError, description: oauthErrorDesc });
-        return;
-      }
-      
-      accessToken = params.get('access_token');
-
-      if (accessToken) {
-        sessionStorage.setItem('purecloud_token', accessToken);
-        window.location.hash = '';
-        initializeApplication();
-      } else if (sessionStorage.getItem('purecloud_token')) {
-        accessToken = sessionStorage.getItem('purecloud_token');
-        initializeApplication();
-      } else {
-        console.log('Initiating OAuth flow with:', { clientId, redirectUri });
-        window.location.href = oauthUrl;
-      }
-    });
-    
-    function showMessage(msg, type='error'){
-      const box = document.getElementById('messageContainer');
-      box.innerHTML = `<div class="${type}-message">${msg}</div>`;
-      box.style.display = 'block';
-      if (type === 'success') setTimeout(()=> box.style.display='none', 5000);
-    }
-    
-    function initializeApplication() {
-      document.getElementById('auth-message').textContent = 'Authenticated successfully!';
-      document.getElementById('authCard').style.display = 'none';
-      document.getElementById('appContent').style.display = 'block';
-      
-      // Load metrics
-      fetchExternalMetrics();
-      
-      // Setup event listeners
-      setupEventListeners();
-    }
-    
-    function setupEventListeners() {
-      // Example CSV download button - FIXED
-      document.getElementById('downloadExampleBtn').addEventListener('click', function() {
-        downloadExampleCSV();
-      });
-      
-      document.getElementById('copyExampleBtn').addEventListener('click', function() {
-        copyExampleFormat();
-      });
-      
-      // File upload area click
-      document.getElementById('fileUploadArea').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
-      });
-      
-      // File input change
-      document.getElementById('fileInput').addEventListener('change', handleFileSelect);
-      
-      // Drag and drop
-      const uploadArea = document.getElementById('fileUploadArea');
-      uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.style.borderColor = 'var(--primary-color)';
-        uploadArea.style.background = '#f0f7f4';
-      });
-      
-      uploadArea.addEventListener('dragleave', (e) => {
-        e.preventDefault();
-        if (!selectedFile) {
-          uploadArea.style.borderColor = 'var(--border-color)';
-          uploadArea.style.background = 'var(--light-bg)';
-        }
-      });
-      
-      uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-          handleFile(files[0]);
-        }
-        uploadArea.style.borderColor = selectedFile ? 'var(--primary-color)' : 'var(--border-color)';
-        uploadArea.style.background = selectedFile ? '#e9f6f0' : 'var(--light-bg)';
-      });
-      
-      // Metric select change
-      document.getElementById('metric-select').addEventListener('change', (e) => {
-        selectedMetricId = e.target.value;
-        if (jsonData && selectedMetricId) {
-          updateJsonPreview();
-        }
-      });
-      
-      // Convert to JSON button
-      document.getElementById('convertToJsonBtn').addEventListener('click', convertToJson);
-      
-      // Upload data button
-      document.getElementById('uploadDataBtn').addEventListener('click', uploadDataToPureCloud);
-    }
-    
-    // Download example CSV file - FIXED
+/* =========================================================================
+   ✔ FIXED CSV DOWNLOAD — RELIABLE + EXCEL OPENS IN COLUMNS
+   ========================================================================= */
 function downloadExampleCSV() {
   try {
     const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
@@ -523,58 +251,42 @@ function downloadExampleCSV() {
     const link = document.createElement('a');
     link.href = url;
     link.download = 'gamification_example.csv';
-
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
+    
     URL.revokeObjectURL(url);
 
     showMessage('Example CSV file downloaded successfully!', 'success');
-
   } catch (error) {
     console.error('Error downloading CSV:', error);
     showMessage('Error downloading example CSV. Please try again.', 'error');
   }
 }
-    
-    // Copy example format to clipboard - FIXED
-    function copyExampleFormat() {
-      // Create a temporary textarea element
-      const textArea = document.createElement('textarea');
-      textArea.value = exampleCSV;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showMessage('CSV format copied to clipboard!', 'success');
-        } else {
-          throw new Error('Copy command failed');
-        }
-      } catch (err) {
-        console.error('Failed to copy: ', err);
-        // Fallback to Clipboard API if available
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(exampleCSV)
-            .then(() => {
-              showMessage('CSV format copied to clipboard!', 'success');
-            })
-            .catch(clipboardErr => {
-              console.error('Clipboard API error: ', clipboardErr);
-              showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-            });
-        } else {
-          showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-        }
-      } finally {
-        document.body.removeChild(textArea);
-      }
+
+/* =========================================================================
+   ✔ FIXED COPY-TO-CLIPBOARD — EXCEL PASTES INTO COLUMNS PROPERLY
+   ========================================================================= */
+function copyExampleFormat() {
+  const textarea = document.createElement('textarea');
+  textarea.value = exampleCSV;
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  try {
+    document.execCommand('copy');
+    showMessage('CSV format copied to clipboard!', 'success');
+  } catch (err) {
+    navigator.clipboard.writeText(exampleCSV)
+      .then(() => showMessage('CSV copied to clipboard!', 'success'))
+      .catch(() => showMessage('Unable to copy CSV. Please copy manually.', 'error'));
+  }
+
+  document.body.removeChild(textarea);
+}
     }
     
     // Fetch external metrics from API
