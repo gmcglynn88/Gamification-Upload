@@ -168,6 +168,19 @@
       gap: 12px;
       margin-top: 12px;
     }
+    
+    .warning-note {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #856404;
+    }
+    .warning-note strong {
+      color: #856404;
+    }
   </style>
 </head>
 <body>
@@ -231,15 +244,7 @@
         </div>
         
         <div class="muted" style="margin-top: 12px;">
-          <strong>Important Notes:</strong>
-          <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-            <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
-            <li><code>DateOccurred</code> (with TWO 'r's) - can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
-            <li>Do NOT include extra empty columns at the end</li>
-            <li>Column names are case-insensitive (UserID, userid, USERID all work)</li>
-            <li>Remove all empty rows from your CSV file before uploading</li>
-            <li>Save your CSV in UTF-8 format for best compatibility</li>
-          </ul>
+          Save your CSV in UTF-8 format for best compatibility
         </div>
       </div>
     </div>
@@ -260,31 +265,26 @@
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
       <div class="date-format-info">
-        <strong>⚠️ Important CSV Format Notice:</strong>
-        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-          <li>Your CSV should have exactly 5 columns: UserID, UserEmail, DateOccurred, Value, Type</li>
-          <li><strong>Note:</strong> "DateOccurred" must be spelled with TWO 'r's (DateOccurred, not DateOccured)</li>
-          <li>Do NOT include extra empty columns at the end</li>
-          <li>Remove all empty rows before and after your data</li>
-          <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
-        </ul>
-      </div>
-      <div class="help-text">
         <strong>CSV Format Requirements:</strong>
-        <ul>
-          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID) OR <code>userEmail</code></li>
-          <li><strong>Required:</strong> <code>dateOccurred</code> (with TWO 'r's - DD/MM/YYYY or YYYY-MM-DD format)</li>
-          <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
-          <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
-          <li><strong>Note:</strong> The <code>count</code> field is NOT used in this API</li>
+        <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+          <li>Your CSV should have exactly 5 header columns <strong>Only</strong>: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
+          <li>Either UserID OR Email Address required</li>
+          <li>Once Data has been submitted to Genesys, it cannot be reverted</li>
+          <li>Type is either 'Total' or 'Cumulative' depending on the metric calculation needed</li>
         </ul>
-        Column names are case-insensitive (userId, userid, USERID all work).
       </div>
+      
+      <div class="warning-note">
+        <strong>⚠️ Important:</strong> Ensure your CSV has separate columns (not all data in one column). 
+        Open your CSV in a text editor to verify it has commas between values.
+      </div>
+      
       <div id="fileUploadArea" class="file-upload-area">
         <div class="upload-icon">📁</div>
         <div><strong>Click to upload CSV file</strong></div>
         <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
-        <div class="muted">Required columns: userId/userEmail, dateOccurred, value, type</div>
+        <div class="muted">Required columns: UserID/UserEmail, DateOccurred, Value, Type</div>
       </div>
       <input type="file" id="fileInput" accept=".csv" style="display:none" />
       <div id="fileName" class="file-name"></div>
@@ -456,9 +456,14 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
     }
     
     function setupEventListeners() {
-      // Example CSV download button
-      document.getElementById('downloadExampleBtn').addEventListener('click', downloadExampleCSV);
-      document.getElementById('copyExampleBtn').addEventListener('click', copyExampleFormat);
+      // Example CSV download button - FIXED
+      document.getElementById('downloadExampleBtn').addEventListener('click', function() {
+        downloadExampleCSV();
+      });
+      
+      document.getElementById('copyExampleBtn').addEventListener('click', function() {
+        copyExampleFormat();
+      });
       
       // File upload area click
       document.getElementById('fileUploadArea').addEventListener('click', () => {
@@ -509,30 +514,67 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       document.getElementById('uploadDataBtn').addEventListener('click', uploadDataToPureCloud);
     }
     
-    // Download example CSV file
+    // Download example CSV file - FIXED
     function downloadExampleCSV() {
-      const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'gamification_example.csv';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      showMessage('Example CSV file downloaded successfully!', 'success');
+      try {
+        const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'gamification_example.csv';
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up URL object
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        
+        showMessage('Example CSV file downloaded successfully!', 'success');
+      } catch (error) {
+        console.error('Error downloading CSV:', error);
+        showMessage('Error downloading example CSV. Please try again.', 'error');
+      }
     }
     
-    // Copy example format to clipboard
+    // Copy example format to clipboard - FIXED
     function copyExampleFormat() {
-      navigator.clipboard.writeText(exampleCSV)
-        .then(() => {
+      // Create a temporary textarea element
+      const textArea = document.createElement('textarea');
+      textArea.value = exampleCSV;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
           showMessage('CSV format copied to clipboard!', 'success');
-        })
-        .catch(err => {
-          console.error('Failed to copy: ', err);
-          showMessage('Failed to copy to clipboard', 'error');
-        });
+        } else {
+          throw new Error('Copy command failed');
+        }
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+        // Fallback to Clipboard API if available
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(exampleCSV)
+            .then(() => {
+              showMessage('CSV format copied to clipboard!', 'success');
+            })
+            .catch(clipboardErr => {
+              console.error('Clipboard API error: ', clipboardErr);
+              showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
+            });
+        } else {
+          showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
+        }
+      } finally {
+        document.body.removeChild(textArea);
+      }
     }
     
     // Fetch external metrics from API
@@ -846,11 +888,11 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             
             // Validate required fields
             if (!userId && !userEmail) {
-              throw new Error(`Row ${index + 2}: Either userId or userEmail is required`);
+              throw new Error(`Row ${index + 2}: Either UserID or UserEmail is required`);
             }
             
             if (!dateOccurredRaw) {
-              throw new Error(`Row ${index + 2}: dateOccurred is required. Found columns: ${Object.keys(normalizedRow).join(', ')}`);
+              throw new Error(`Row ${index + 2}: DateOccurred is required. Found columns: ${Object.keys(normalizedRow).join(', ')}`);
             }
             
             // Convert date format from UK (DD/MM/YYYY) to ISO (YYYY-MM-DD)
@@ -864,17 +906,17 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             // Validate type field
             const normalizedType = type.toLowerCase().trim();
             if (!normalizedType) {
-              throw new Error(`Row ${index + 2}: type is required and must be "Total" or "Cumulative"`);
+              throw new Error(`Row ${index + 2}: Type is required and must be "Total" or "Cumulative"`);
             }
             
             if (normalizedType !== 'total' && normalizedType !== 'cumulative') {
-              throw new Error(`Row ${index + 2}: type must be "Total" or "Cumulative" (got: "${type}")`);
+              throw new Error(`Row ${index + 2}: Type must be "Total" or "Cumulative" (got: "${type}")`);
             }
             
             // Parse numeric value
             const parsedValue = parseFloat(value);
             if (isNaN(parsedValue)) {
-              throw new Error(`Row ${index + 2}: value must be a number (got: "${value}")`);
+              throw new Error(`Row ${index + 2}: Value must be a number (got: "${value}")`);
             }
             
             // Create item according to the correct JSON structure
@@ -1010,8 +1052,8 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           <div class="success-message">
             ✅ Successfully uploaded ${jsonData.items.length} metric data points!
           </div>
-          <div class="muted" style="margin-top: 12px;">
-            The data has been submitted to the external metrics system.
+          <div class="warning-note" style="margin-top: 12px;">
+            <strong>⚠️ Important:</strong> Data has been submitted to Genesys and cannot be reverted.
           </div>
         `;
         
