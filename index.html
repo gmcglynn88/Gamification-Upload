@@ -168,19 +168,6 @@
       gap: 12px;
       margin-top: 12px;
     }
-    
-    .warning-note {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      border-radius: 6px;
-      padding: 12px;
-      margin: 12px 0;
-      font-size: 14px;
-      color: #856404;
-    }
-    .warning-note strong {
-      color: #856404;
-    }
   </style>
 </head>
 <body>
@@ -244,7 +231,14 @@
         </div>
         
         <div class="muted" style="margin-top: 12px;">
-          Save your CSV in UTF-8 format for best compatibility
+          <strong>Important Notes:</strong>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+            <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
+            <li><code>DateOccurred</code> should be DD/MM/YYYY
+            <li>Column do not change or add to the column headers 
+            <li>Remove all empty rows from your CSV file before uploading</li>
+            <li>Save your CSV in UTF-8 format for best compatibility</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -265,26 +259,30 @@
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
       <div class="date-format-info">
-        <strong>CSV Format Requirements:</strong>
+        <strong>⚠️ Important CSV Format Notice:</strong>
         <ul style="margin: 8px 0 0 0; padding-left: 20px;">
-          <li>Your CSV should have exactly 5 header columns <strong>Only</strong>: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li>Your CSV should have exactly 5 columns: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li>Do NOT include extra empty columns at the end</li>
+          <li>Remove all empty rows before and after your data</li>
           <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
-          <li>Either UserID OR Email Address required</li>
-          <li>Once Data has been submitted to Genesys, it cannot be reverted</li>
-          <li>Type is either 'Total' or 'Cumulative' depending on the metric calculation needed</li>
         </ul>
       </div>
-      
-      <div class="warning-note">
-        <strong>⚠️ Important:</strong> Ensure your CSV has separate columns (not all data in one column). 
-        Open your CSV in a text editor to verify it has commas between values.
+      <div class="help-text">
+        <strong>CSV Format Requirements:</strong>
+        <ul>
+          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID) OR <code>userEmail</code></li>
+          <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
+          <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
+          <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
+          <li><strong>Note:</strong> The <code>count</code> field is NOT used in this API</li>
+        </ul>
+        Column names are case-insensitive (userId, userid, USERID all work).
       </div>
-      
       <div id="fileUploadArea" class="file-upload-area">
         <div class="upload-icon">📁</div>
         <div><strong>Click to upload CSV file</strong></div>
         <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
-        <div class="muted">Required columns: UserID/UserEmail, DateOccurred, Value, Type</div>
+        <div class="muted">Required columns: userId/userEmail, dateOccurred, value, type</div>
       </div>
       <input type="file" id="fileInput" accept=".csv" style="display:none" />
       <div id="fileName" class="file-name"></div>
@@ -456,14 +454,9 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
     }
     
     function setupEventListeners() {
-      // Example CSV download button - FIXED
-      document.getElementById('downloadExampleBtn').addEventListener('click', function() {
-        downloadExampleCSV();
-      });
-      
-      document.getElementById('copyExampleBtn').addEventListener('click', function() {
-        copyExampleFormat();
-      });
+      // Example CSV download button
+      document.getElementById('downloadExampleBtn').addEventListener('click', downloadExampleCSV);
+      document.getElementById('copyExampleBtn').addEventListener('click', copyExampleFormat);
       
       // File upload area click
       document.getElementById('fileUploadArea').addEventListener('click', () => {
@@ -514,67 +507,30 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       document.getElementById('uploadDataBtn').addEventListener('click', uploadDataToPureCloud);
     }
     
-    // Download example CSV file - FIXED
+    // Download example CSV file
     function downloadExampleCSV() {
-      try {
-        const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'gamification_example.csv';
-        
-        // Append to body, click, and remove
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Clean up URL object
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-        
-        showMessage('Example CSV file downloaded successfully!', 'success');
-      } catch (error) {
-        console.error('Error downloading CSV:', error);
-        showMessage('Error downloading example CSV. Please try again.', 'error');
-      }
+      const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'gamification_example.csv';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Example CSV file downloaded successfully!', 'success');
     }
     
-    // Copy example format to clipboard - FIXED
+    // Copy example format to clipboard
     function copyExampleFormat() {
-      // Create a temporary textarea element
-      const textArea = document.createElement('textarea');
-      textArea.value = exampleCSV;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
+      navigator.clipboard.writeText(exampleCSV)
+        .then(() => {
           showMessage('CSV format copied to clipboard!', 'success');
-        } else {
-          throw new Error('Copy command failed');
-        }
-      } catch (err) {
-        console.error('Failed to copy: ', err);
-        // Fallback to Clipboard API if available
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(exampleCSV)
-            .then(() => {
-              showMessage('CSV format copied to clipboard!', 'success');
-            })
-            .catch(clipboardErr => {
-              console.error('Clipboard API error: ', clipboardErr);
-              showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-            });
-        } else {
-          showMessage('Failed to copy to clipboard. Please manually select and copy the example table.', 'error');
-        }
-      } finally {
-        document.body.removeChild(textArea);
-      }
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          showMessage('Failed to copy to clipboard', 'error');
+        });
     }
     
     // Fetch external metrics from API
@@ -666,26 +622,16 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       reader.readAsText(file);
     }
     
-    // ULTRA ROBUST CSV PARSER - specifically for your Excel-style CSV
+    // Improved CSV parsing that handles Excel-style CSVs with trailing commas
     function parseCSV(csvText) {
       try {
-        // Log raw input for debugging
-        console.log('Raw CSV text first 500 chars:', csvText.substring(0, 500));
-        
-        // Handle BOM and different line endings
+        // Handle different line endings and BOM (byte order mark)
         let text = csvText;
-        
-        // Remove BOM if present
-        if (text.charCodeAt(0) === 0xFEFF || text.charCodeAt(0) === 0xFFFE) {
-          text = text.substring(1);
+        if (text.charCodeAt(0) === 0xFEFF) {
+          text = text.substring(1); // Remove BOM if present
         }
         
-        // Replace different line endings with \n
-        text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        
-        const lines = text.split('\n');
-        console.log('Total lines found:', lines.length);
-        
+        const lines = text.split(/\r\n|\n|\r/);
         if (lines.length === 0) {
           showMessage('CSV file is empty', 'error');
           return;
@@ -700,96 +646,89 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           }
         }
         
-        // Get the header line
+        // Get headers - use simple split for headers
         const headerLine = lines[headerLineIndex];
-        console.log('Header line raw:', headerLine);
-        
-        // SPECIAL FIX: For Excel CSVs that might have the entire line in quotes or other issues
-        // Let's split by comma but be smart about it
-        let headers = [];
-        
-        // Try multiple parsing strategies
-        if (headerLine.includes('"')) {
-          // Handle quoted headers
-          headers = headerLine.match(/(?:[^,"]+|"[^"]*")+/g) || [];
-          headers = headers.map(h => h.replace(/^"|"$/g, '').trim());
-        } else {
-          // Simple split for unquoted headers
-          headers = headerLine.split(',').map(h => h.trim());
-        }
-        
-        // Clean up headers - remove any empty ones
-        headers = headers.filter(h => h.length > 0);
+        const headers = headerLine.split(',').map(h => h.trim().replace(/"/g, ''));
         
         console.log('Headers found:', headers);
-        console.log('Number of headers:', headers.length);
+        console.log('Header line:', headerLine);
         
         // Parse data rows
         csvData = [];
         
         for (let i = headerLineIndex + 1; i < lines.length; i++) {
-          const line = lines[i].trim();
+          let line = lines[i];
           
-          // Skip empty lines
-          if (!line || line === '' || line.replace(/,/g, '').trim().length === 0) {
+          // Skip if line is empty or contains only commas
+          if (!line || line.replace(/,/g, '').trim().length === 0) {
             continue;
           }
           
-          console.log(`Processing line ${i}:`, line);
+          // Clean up the line - remove trailing commas that Excel might add
+          line = line.replace(/,+$/, '');
           
-          let values = [];
+          // Split by comma, but handle quoted values
+          const values = [];
+          let currentValue = '';
+          let insideQuotes = false;
           
-          // Try different parsing strategies for data rows too
-          if (line.includes('"')) {
-            // Handle quoted values
-            values = line.match(/(?:[^,"]+|"[^"]*")+/g) || [];
-            values = values.map(v => v.replace(/^"|"$/g, '').trim());
-          } else {
-            // Simple split for unquoted values
-            values = line.split(',').map(v => v.trim());
+          for (let j = 0; j < line.length; j++) {
+            const char = line[j];
+            const nextChar = line[j + 1];
+            
+            if (char === '"' && !insideQuotes) {
+              insideQuotes = true;
+            } else if (char === '"' && insideQuotes && nextChar === '"') {
+              currentValue += '"';
+              j++; // Skip next quote
+            } else if (char === '"' && insideQuotes) {
+              insideQuotes = false;
+            } else if (char === ',' && !insideQuotes) {
+              values.push(currentValue.trim());
+              currentValue = '';
+            } else {
+              currentValue += char;
+            }
           }
           
-          // Ensure we have enough values for all headers
-          while (values.length < headers.length) {
-            values.push('');
-          }
+          // Add the last value
+          values.push(currentValue.trim());
           
-          // Create row object
+          // Create row object, mapping values to headers
           const row = {};
           let hasData = false;
           
-          for (let j = 0; j < headers.length; j++) {
+          for (let j = 0; j < Math.min(headers.length, values.length); j++) {
             const header = headers[j];
             const value = values[j] || '';
             row[header] = value;
             
+            // Check if this row has any non-empty data
             if (value && value.trim().length > 0) {
               hasData = true;
             }
           }
           
-          // Log the parsed row for debugging
-          console.log(`Row ${csvData.length + 1}:`, row);
-          
+          // Only add row if it has data
           if (hasData) {
             csvData.push(row);
           }
         }
         
         if (csvData.length === 0) {
-          showMessage('No valid data found in CSV file. Please ensure your CSV has data rows.', 'error');
+          showMessage('No valid data found in CSV file', 'error');
           return;
         }
         
-        console.log(`Successfully parsed ${csvData.length} valid rows from CSV`);
-        console.log('First row data:', csvData[0]);
+        console.log(`Parsed ${csvData.length} valid rows from CSV`);
+        console.log('First row:', csvData[0]);
         
         // Show preview
         showCSVPreview(headers, csvData);
         
       } catch (error) {
         console.error('Error parsing CSV:', error);
-        showMessage(`Error parsing CSV: ${error.message}. Please ensure your CSV is properly formatted.`, 'error');
+        showMessage(`Error parsing CSV: ${error.message}`, 'error');
       }
     }
     
@@ -846,7 +785,7 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       document.getElementById('csvPreviewCard').style.display = 'block';
     }
     
-    // Convert CSV data to JSON - UPDATED TO HANDLE MISSPELLED "DateOccured"
+    // Convert CSV data to JSON
     function convertToJson() {
       const metricSelect = document.getElementById('metric-select');
       if (!metricSelect.value) {
@@ -859,46 +798,32 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
         const items = [];
         let validationErrors = [];
         
-        console.log('Converting CSV to JSON. CSV data:', csvData);
-        
         csvData.forEach((row, index) => {
           try {
-            // Log the row being processed
-            console.log(`Processing row ${index}:`, row);
-            
             // Normalize column names (case-insensitive)
             const normalizedRow = {};
             Object.keys(row).forEach(key => {
               normalizedRow[key.toLowerCase()] = row[key];
             });
             
-            console.log(`Normalized row ${index}:`, normalizedRow);
-            
             // Get values with fallbacks for different column names
             const userId = normalizedRow.userid || normalizedRow.user_id || '';
             const userEmail = normalizedRow.useremail || normalizedRow.user_email || normalizedRow.email || '';
-            
-            // FIX: Handle both "dateoccurred" (correct) and "dateoccured" (misspelled)
-            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.dateoccured || normalizedRow.date_occurred || normalizedRow.date || '';
-            
+            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.date_occurred || normalizedRow.date || '';
             const value = normalizedRow.value || '0';
             const type = normalizedRow.type || '';
             
-            console.log(`Row ${index} values:`, { userId, userEmail, dateOccurredRaw, value, type });
-            
             // Validate required fields
             if (!userId && !userEmail) {
-              throw new Error(`Row ${index + 2}: Either UserID or UserEmail is required`);
+              throw new Error(`Row ${index + 2}: Either userId or userEmail is required`);
             }
             
             if (!dateOccurredRaw) {
-              throw new Error(`Row ${index + 2}: DateOccurred is required. Found columns: ${Object.keys(normalizedRow).join(', ')}`);
+              throw new Error(`Row ${index + 2}: dateOccurred is required`);
             }
             
             // Convert date format from UK (DD/MM/YYYY) to ISO (YYYY-MM-DD)
             const dateOccurredISO = convertToISODate(dateOccurredRaw);
-            console.log(`Row ${index} date conversion: "${dateOccurredRaw}" -> "${dateOccurredISO}"`);
-            
             if (!validateISODate(dateOccurredISO)) {
               throw new Error(`Row ${index + 2}: Invalid date format. Use DD/MM/YYYY or YYYY-MM-DD. Got: "${dateOccurredRaw}"`);
             }
@@ -906,17 +831,17 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             // Validate type field
             const normalizedType = type.toLowerCase().trim();
             if (!normalizedType) {
-              throw new Error(`Row ${index + 2}: Type is required and must be "Total" or "Cumulative"`);
+              throw new Error(`Row ${index + 2}: type is required and must be "Total" or "Cumulative"`);
             }
             
             if (normalizedType !== 'total' && normalizedType !== 'cumulative') {
-              throw new Error(`Row ${index + 2}: Type must be "Total" or "Cumulative" (got: "${type}")`);
+              throw new Error(`Row ${index + 2}: type must be "Total" or "Cumulative" (got: "${type}")`);
             }
             
             // Parse numeric value
             const parsedValue = parseFloat(value);
             if (isNaN(parsedValue)) {
-              throw new Error(`Row ${index + 2}: Value must be a number (got: "${value}")`);
+              throw new Error(`Row ${index + 2}: value must be a number (got: "${value}")`);
             }
             
             // Create item according to the correct JSON structure
@@ -934,11 +859,9 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
               item.userEmail = userEmail;
             }
             
-            console.log(`Created item for row ${index}:`, item);
             items.push(item);
             
           } catch (rowError) {
-            console.error(`Error in row ${index}:`, rowError.message);
             validationErrors.push(rowError.message);
           }
         });
@@ -1052,8 +975,8 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
           <div class="success-message">
             ✅ Successfully uploaded ${jsonData.items.length} metric data points!
           </div>
-          <div class="warning-note" style="margin-top: 12px;">
-            <strong>⚠️ Important:</strong> Data has been submitted to Genesys and cannot be reverted.
+          <div class="muted" style="margin-top: 12px;">
+            The data has been submitted to the external metrics system.
           </div>
         `;
         
