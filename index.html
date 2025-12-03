@@ -121,6 +121,53 @@
       margin: 12px 0;
       font-size: 14px;
     }
+    
+    .example-csv-section {
+      background: #e9f6f0;
+      border: 1px solid var(--primary-color);
+      border-radius: 6px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    .example-csv-section h3 {
+      margin-top: 0;
+      color: var(--secondary-color);
+    }
+    .example-csv-section code {
+      background: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .example-csv-table {
+      width: 100%;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    .example-csv-table th,
+    .example-csv-table td {
+      padding: 6px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    .example-csv-table th {
+      background: #f0f7f4;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      border-color: #6c757d;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      border-color: #545b62;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
@@ -136,6 +183,69 @@
 
   <div id="appContent" style="display:none;">
     <div id="messageContainer"></div>
+
+    <!-- Example CSV Section -->
+    <div class="card">
+      <h2 class="section-title">Example CSV Format</h2>
+      <div class="example-csv-section">
+        <p>Download an example CSV file to ensure your data is in the correct format:</p>
+        
+        <table class="example-csv-table">
+          <thead>
+            <tr>
+              <th>UserID</th>
+              <th>UserEmail</th>
+              <th>DateOccurred</th>
+              <th>Value</th>
+              <th>Type</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>08377fd8-3680-4a50-b909-c685e1567659</td>
+              <td>john.doe@company.com</td>
+              <td>03/12/2025</td>
+              <td>95</td>
+              <td>total</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>1a2b3c4d-5678-90ef-ghij-klmnopqrstuv</td>
+              <td>jane.smith@company.com</td>
+              <td>2025-12-02</td>
+              <td>42.5</td>
+              <td>cumulative</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>mike.jones@company.com</td>
+              <td>02/12/2025</td>
+              <td>100</td>
+              <td>total</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="action-buttons">
+          <button id="downloadExampleBtn" class="btn-secondary">📥 Download Example CSV</button>
+          <button id="copyExampleBtn" class="btn-secondary">📋 Copy CSV Format</button>
+        </div>
+        
+        <div class="muted" style="margin-top: 12px;">
+          <strong>Notes:</strong>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+            <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
+            <li><code>DateOccurred</code> can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
+            <li><code>Count</code> field is NOT used by the API but can be included in CSV</li>
+            <li>Column names are case-insensitive (UserID, userid, USERID all work)</li>
+            <li>Remove all empty rows from your CSV file before uploading</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
     <div class="card">
       <h2 class="section-title">Select Metric</h2>
@@ -159,12 +269,12 @@
       <div class="help-text">
         <strong>CSV Format Requirements:</strong>
         <ul>
-          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID)</li>
-          <li><strong>Optional:</strong> <code>userEmail</code> (can be used instead of userId)</li>
+          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID) OR <code>userEmail</code></li>
           <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
           <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
           <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
           <li><strong>Note:</strong> <code>count</code> field is NOT used in this API</li>
+          <li><strong>Important:</strong> Remove all empty rows from your CSV file</li>
         </ul>
         Column names are case-insensitive (userId, userid, USERID all work).
       </div>
@@ -212,6 +322,14 @@
     let csvData = [];
     let jsonData = null;
     let selectedMetricId = null;
+
+    // ===== Example CSV Data =====
+    const exampleCSV = `UserID,UserEmail,DateOccurred,Value,Count,Type
+08377fd8-3680-4a50-b909-c685e1567659,john.doe@company.com,03/12/2025,95,,total
+1a2b3c4d-5678-90ef-ghij-klmnopqrstuv,jane.smith@company.com,2025-12-02,42.5,,cumulative
+,mike.jones@company.com,02/12/2025,100,,total
+abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,,total
+,admin@company.com,2025-11-30,50.25,,cumulative`;
 
     // ===== Date Format Conversion Functions =====
     function convertToISODate(dateStr) {
@@ -336,6 +454,10 @@
     }
     
     function setupEventListeners() {
+      // Example CSV download button
+      document.getElementById('downloadExampleBtn').addEventListener('click', downloadExampleCSV);
+      document.getElementById('copyExampleBtn').addEventListener('click', copyExampleFormat);
+      
       // File upload area click
       document.getElementById('fileUploadArea').addEventListener('click', () => {
         document.getElementById('fileInput').click();
@@ -383,6 +505,32 @@
       
       // Upload data button
       document.getElementById('uploadDataBtn').addEventListener('click', uploadDataToPureCloud);
+    }
+    
+    // Download example CSV file
+    function downloadExampleCSV() {
+      const blob = new Blob([exampleCSV], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'gamification_example.csv';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Example CSV file downloaded successfully!', 'success');
+    }
+    
+    // Copy example format to clipboard
+    function copyExampleFormat() {
+      navigator.clipboard.writeText(exampleCSV)
+        .then(() => {
+          showMessage('CSV format copied to clipboard!', 'success');
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+          showMessage('Failed to copy to clipboard', 'error');
+        });
     }
     
     // Fetch external metrics from API
@@ -474,25 +622,47 @@
       reader.readAsText(file);
     }
     
-    // Parse CSV data with better handling
+    // Improved CSV parsing with better empty row handling
     function parseCSV(csvText) {
       try {
-        // Handle different line endings
-        const lines = csvText.split(/\r\n|\n|\r/);
+        // Handle different line endings and BOM (byte order mark)
+        let text = csvText;
+        if (text.charCodeAt(0) === 0xFEFF) {
+          text = text.substring(1); // Remove BOM if present
+        }
+        
+        const lines = text.split(/\r\n|\n|\r/);
         if (lines.length === 0) {
           showMessage('CSV file is empty', 'error');
           return;
         }
         
-        // Get headers (first line) and clean them
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        // Find first non-empty line for headers
+        let headerLineIndex = 0;
+        for (let i = 0; i < lines.length; i++) {
+          if (lines[i].trim().length > 0) {
+            headerLineIndex = i;
+            break;
+          }
+        }
         
-        // Parse data rows
+        // Get headers from first non-empty line and clean them
+        const headers = lines[headerLineIndex].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        console.log('Headers found:', headers);
+        console.log('Header line index:', headerLineIndex);
+        
+        // Parse data rows, skipping empty rows and rows that are completely empty
         csvData = [];
         
-        for (let i = 1; i < lines.length; i++) {
+        for (let i = headerLineIndex + 1; i < lines.length; i++) {
           const line = lines[i].trim();
-          if (!line) continue; // Skip empty lines
+          
+          // Skip if line is empty or contains only commas
+          if (!line || line.replace(/,/g, '').trim().length === 0) {
+            console.log(`Skipping empty line at row ${i + 1}`);
+            continue;
+          }
           
           // Simple CSV parsing that handles quoted values
           const values = [];
@@ -521,6 +691,11 @@
           // Add the last value
           values.push(currentValue.trim().replace(/"/g, ''));
           
+          // Pad values if needed
+          while (values.length < headers.length) {
+            values.push('');
+          }
+          
           // Create row object
           const row = {};
           let hasData = false;
@@ -528,11 +703,15 @@
           headers.forEach((header, index) => {
             const value = values[index] || '';
             row[header] = value;
-            if (value) hasData = true;
+            if (value && value.trim().length > 0) hasData = true;
           });
           
+          // Only add row if it has data
           if (hasData) {
+            console.log(`Adding row ${csvData.length + 1}:`, row);
             csvData.push(row);
+          } else {
+            console.log(`Skipping data-less row at line ${i + 1}`);
           }
         }
         
@@ -541,7 +720,8 @@
           return;
         }
         
-        console.log(`Parsed ${csvData.length} rows from CSV`);
+        console.log(`Parsed ${csvData.length} valid rows from CSV`);
+        console.log('First row:', csvData[0]);
         
         // Show preview
         showCSVPreview(headers, csvData);
