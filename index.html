@@ -234,8 +234,8 @@
           <strong>Important Notes:</strong>
           <ul style="margin: 8px 0 0 0; padding-left: 20px;">
             <li>Either <code>UserID</code> OR <code>UserEmail</code> is required (both not needed)</li>
-            <li><code>DateOccurred</code> can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
-            <li>Do NOT include empty columns or extra commas at the end of rows</li>
+            <li><code>DateOccurred</code> (with TWO 'r's) - can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
+            <li>Do NOT include extra empty columns at the end</li>
             <li>Column names are case-insensitive (UserID, userid, USERID all work)</li>
             <li>Remove all empty rows from your CSV file before uploading</li>
             <li>Save your CSV in UTF-8 format for best compatibility</li>
@@ -263,6 +263,7 @@
         <strong>⚠️ Important CSV Format Notice:</strong>
         <ul style="margin: 8px 0 0 0; padding-left: 20px;">
           <li>Your CSV should have exactly 5 columns: UserID, UserEmail, DateOccurred, Value, Type</li>
+          <li><strong>Note:</strong> "DateOccurred" must be spelled with TWO 'r's (DateOccurred, not DateOccured)</li>
           <li>Do NOT include extra empty columns at the end</li>
           <li>Remove all empty rows before and after your data</li>
           <li>Date can be UK format (DD/MM/YYYY) or ISO format (YYYY-MM-DD)</li>
@@ -272,7 +273,7 @@
         <strong>CSV Format Requirements:</strong>
         <ul>
           <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID) OR <code>userEmail</code></li>
-          <li><strong>Required:</strong> <code>dateOccurred</code> (DD/MM/YYYY or YYYY-MM-DD format)</li>
+          <li><strong>Required:</strong> <code>dateOccurred</code> (with TWO 'r's - DD/MM/YYYY or YYYY-MM-DD format)</li>
           <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
           <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
           <li><strong>Note:</strong> The <code>count</code> field is NOT used in this API</li>
@@ -803,7 +804,7 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
       document.getElementById('csvPreviewCard').style.display = 'block';
     }
     
-    // Convert CSV data to JSON
+    // Convert CSV data to JSON - UPDATED TO HANDLE MISSPELLED "DateOccured"
     function convertToJson() {
       const metricSelect = document.getElementById('metric-select');
       if (!metricSelect.value) {
@@ -834,7 +835,10 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             // Get values with fallbacks for different column names
             const userId = normalizedRow.userid || normalizedRow.user_id || '';
             const userEmail = normalizedRow.useremail || normalizedRow.user_email || normalizedRow.email || '';
-            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.date_occurred || normalizedRow.date || '';
+            
+            // FIX: Handle both "dateoccurred" (correct) and "dateoccured" (misspelled)
+            const dateOccurredRaw = normalizedRow.dateoccurred || normalizedRow.dateoccured || normalizedRow.date_occurred || normalizedRow.date || '';
+            
             const value = normalizedRow.value || '0';
             const type = normalizedRow.type || '';
             
@@ -846,7 +850,7 @@ abc12345-6789-1011-1213-141516171819,sarah.wilson@company.com,01/12/2025,75,tota
             }
             
             if (!dateOccurredRaw) {
-              throw new Error(`Row ${index + 2}: dateOccurred is required`);
+              throw new Error(`Row ${index + 2}: dateOccurred is required. Found columns: ${Object.keys(normalizedRow).join(', ')}`);
             }
             
             // Convert date format from UK (DD/MM/YYYY) to ISO (YYYY-MM-DD)
