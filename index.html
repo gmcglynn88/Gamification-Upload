@@ -28,7 +28,7 @@
 
     #messageContainer{display:none;margin-top:12px}
     .error-message{color:#b4231a;background:#fee2e2;border:1px solid #fecaca;padding:10px;border-radius:6px}
-    .success-message{color:#14532d;background:#dcfce7;border:1px solid #bbf7d0;padding:10px;border-radius=6px}
+    .success-message{color:#14532d;background:#dcfce7;border:1px solid #bbf7d0;padding:10px;border-radius:6px}
     .info-message{color:#6b4e16;background:#fff7ed;border:1px solid #ffedd5;padding:10px;border-radius:6px}
 
     .file-upload-area{
@@ -97,6 +97,21 @@
     .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(0,0,0,0.1); border-radius: 50%; border-top-color: var(--primary-color); animation: spin 1s ease-in-out infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading { display: flex; align-items: center; gap: 8px; }
+    
+    .help-text {
+      background: #f8f9fa;
+      border-left: 3px solid var(--primary-color);
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .help-text ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .help-text li {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -128,11 +143,23 @@
 
     <div class="card">
       <h2 class="section-title">Upload CSV File</h2>
+      <div class="help-text">
+        <strong>CSV Format Requirements:</strong>
+        <ul>
+          <li><strong>Required:</strong> <code>userId</code> (PureCloud user ID)</li>
+          <li><strong>Optional:</strong> <code>userEmail</code> (can be used instead of userId)</li>
+          <li><strong>Required:</strong> <code>dateOccurred</code> (YYYY-MM-DD format)</li>
+          <li><strong>Required:</strong> <code>value</code> (numeric value)</li>
+          <li><strong>Required:</strong> <code>type</code> ("Total" or "Cumulative")</li>
+          <li><strong>Note:</strong> <code>count</code> field is NOT used in this API</li>
+        </ul>
+        Column names are case-insensitive (userId, userid, USERID all work).
+      </div>
       <div id="fileUploadArea" class="file-upload-area">
         <div class="upload-icon">📁</div>
         <div><strong>Click to upload CSV file</strong></div>
         <div class="muted" style="margin-top: 8px;">or drag and drop your file here</div>
-        <div class="muted">File should contain the following columns: userId, userEmail, dateOccurred, value, count, type</div>
+        <div class="muted">Minimum columns: userId/userEmail, dateOccurred, value, type</div>
       </div>
       <input type="file" id="fileInput" accept=".csv" style="display:none" />
       <div id="fileName" class="file-name"></div>
@@ -165,7 +192,6 @@
     console.log('OAuth Configuration:');
     console.log('- Client ID:', clientId);
     console.log('- Redirect URI:', redirectUri);
-    console.log('- Encoded Redirect URI:', encodeURIComponent(redirectUri));
     console.log('- Full OAuth URL:', oauthUrl);
 
     let accessToken = null;
@@ -378,7 +404,6 @@
         
         // Parse data rows
         csvData = [];
-        let errorRows = [];
         
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
@@ -521,10 +546,9 @@
             const userEmail = normalizedRow.useremail || normalizedRow.user_email || normalizedRow.email || '';
             const dateOccurred = normalizedRow.dateoccurred || normalizedRow.date_occurred || normalizedRow.date || '';
             const value = normalizedRow.value || '0';
-            const count = normalizedRow.count || '1';
-            const type = normalizedRow.type || 'External';
+            const type = normalizedRow.type || '';
             
-            // Validate required fields
+            // Validate required fields - now only userId OR userEmail is needed
             if (!userId && !userEmail) {
               throw new Error(`Row ${index + 2}: Either userId or userEmail is required`);
             }
@@ -533,27 +557,38 @@
               throw new Error(`Row ${index + 2}: dateOccurred is required`);
             }
             
-            // Parse numeric values
-            const parsedValue = parseFloat(value);
-            const parsedCount = parseInt(count, 10);
+            // Validate type field
+            const normalizedType = type.toLowerCase().trim();
+            if (!normalizedType) {
+              throw new Error(`Row ${index + 2}: type is required and must be "Total" or "Cumulative"`);
+            }
             
+            if (normalizedType !== 'total' && normalizedType !== 'cumulative') {
+              throw new Error(`Row ${index + 2}: type must be "Total" or "Cumulative" (got: "${type}")`);
+            }
+            
+            // Parse numeric value
+            const parsedValue = parseFloat(value);
             if (isNaN(parsedValue)) {
               throw new Error(`Row ${index + 2}: value must be a number (got: "${value}")`);
             }
             
-            if (isNaN(parsedCount)) {
-              throw new Error(`Row ${index + 2}: count must be an integer (got: "${count}")`);
+            // Create item according to the correct JSON structure
+            const item = {
+              metricId: metricSelect.value,
+              type: type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(), // Capitalize first letter
+              dateOccurred: dateOccurred,
+              value: parsedValue
+            };
+            
+            // Add userId OR userEmail (not both required in your example)
+            if (userId) {
+              item.userId = userId;
+            } else if (userEmail) {
+              item.userEmail = userEmail;
             }
             
-            const item = {
-              userId: userId,
-              userEmail: userEmail,
-              metricId: metricSelect.value,
-              dateOccurred: dateOccurred,
-              value: parsedValue,
-              count: parsedCount,
-              type: type
-            };
+            // Note: count field is NOT included as it's not in your example JSON
             
             items.push(item);
             
@@ -575,6 +610,7 @@
         };
         
         console.log(`Converted ${items.length} rows to JSON`);
+        console.log('Sample JSON item:', items[0]);
         
         // Update JSON preview
         updateJsonPreview();
@@ -647,6 +683,7 @@
         });
         
         console.log(`Uploading ${jsonData.items.length} items to PureCloud...`);
+        console.log('Sample data being sent:', jsonData.items[0]);
         
         // Make API call
         const response = await fetch('https://api.mypurecloud.ie/api/v2/employeeperformance/externalmetrics/data', {
